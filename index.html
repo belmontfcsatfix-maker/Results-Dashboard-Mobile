@@ -279,6 +279,9 @@ async function loadData() {
       return m ? 'U' + m[1] + (girls ? 'G' : '') : 'Other';
     }
 
+    // Log headers once so you can confirm the exact column name in the browser console
+    if (rows.length > 0) console.log('[BFC Debug] CSV columns:', Object.keys(rows[0]));
+
     const ALL_PROCESSED = rows.map(g => {
       const bh = /belmont/i.test(g.home);
       const isNP = g.played === 'N';
@@ -292,13 +295,15 @@ async function loadData() {
       }
       const isGirls = /girls/i.test(g.division_raw || '');
       const divVal = getDiv(g.division_raw).replace(/G+$/i, '') + (isGirls ? 'G' : '');
+      const ko = g.ko || g.kick_off || g.kickoff || g.kick_off_time || g.time || g['kick off'] || g['kick-off'] || '';
       return { 
         ...g, 
         division: divVal, 
         age: getAge(g.division_raw, isGirls), 
         is_home: bh, 
         result_type,
-        tournament: g.tournament || 'League'
+        tournament: g.tournament || 'League',
+        ko: ko
       };
     });
 
